@@ -10,3 +10,8 @@
 
 **/__pycache__
 
+# brainweb data
+**/*.gz
+**/*.npz
+
+**/*.png
