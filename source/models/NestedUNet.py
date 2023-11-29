@@ -1,3 +1,6 @@
+### NestedUNet implementation from Wei Qiu ###
+### Not sure whether from github or anywhere else ###
+
 import torch
 from torch import nn
 from torch.nn import functional as F

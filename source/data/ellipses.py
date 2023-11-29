@@ -1,3 +1,7 @@
+### Ellipse trainind dataset for PyTorch ###
+### Creates sensitivity images and corresponding CT images ###
+### Sam Porter 1st verstion 2023-29-11 ###
+
 import numpy as np
 import torch
 from sirf.STIR import AcquisitionSensitivityModel, AcquisitionModelUsingRayTracingMatrix

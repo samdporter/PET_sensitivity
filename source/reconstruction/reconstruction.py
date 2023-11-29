@@ -1,3 +1,6 @@
+### Reconstruction functions ###
+### Sam Porter 1st version 2023-29-11 ###
+
 import sirf.STIR as stir
 import numpy as np
 

@@ -1,3 +1,6 @@
+### Misc functions for reconstruction ###
+### Sam Porter 1st version 2023-29-11 ###
+
 import numpy as np
 
 def crop_image_to_circle(image, radius):

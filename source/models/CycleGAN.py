@@ -1,3 +1,7 @@
+### CycleGAN model ###
+### Sam Porter 1st version 2023-29-11 ###
+
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

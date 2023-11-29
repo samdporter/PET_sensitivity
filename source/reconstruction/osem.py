@@ -1,3 +1,7 @@
+### OSEM Reconstruction ###
+### Includes functions for performing OSEM reconstruction with or without resampling ###
+### Sam Porter 1st version 2023-29-11 ###
+
 import sirf.Reg as reg
 import sirf.STIR as stir
 from misc import crop_image_to_circle, division

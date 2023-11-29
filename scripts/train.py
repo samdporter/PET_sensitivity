@@ -1,3 +1,7 @@
+### Script to train UNet + UNet++ models on simulated data ###
+### Sam Porter 1st verstion 2023-29-11 ###
+
+
 import torch
 import torch.nn as nn
 import torch.optim as optim

@@ -1,3 +1,6 @@
+### Script to create training data for the neural network ###
+### Sam Porter 1st verstion 2023-29-11 ###
+
 import os
 import sys
 import argparse

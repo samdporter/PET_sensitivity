@@ -1,3 +1,6 @@
+### Registration functions for PET reconstruction ###
+### Sam Porter 1st version 2023-29-11 ###
+
 import numpy as np
 from scipy.ndimage import affine_transform
 import sirf.Reg as reg
