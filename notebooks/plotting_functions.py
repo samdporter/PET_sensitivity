@@ -53,3 +53,14 @@ def plot_pet_acquisition(image, sinogram, angles, output_filename):
 
     # prevent the figure from being displayed
     plt.close()
+
+
+def plot_2d_image(idx,vol,title,clims=None,cmap="viridis"):
+    """Customized version of subplot to plot 2D image"""
+    plt.subplot(*idx)
+    plt.imshow(vol,cmap=cmap)
+    if not clims is None:
+        plt.clim(clims)
+    plt.colorbar(shrink=.4)
+    plt.title(title)
+    plt.axis("off")

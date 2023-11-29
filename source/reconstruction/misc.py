@@ -20,3 +20,9 @@ def crop_image_to_circle(image, radius):
 
 def division(a, b, eps=1e-10):
     return (a+eps) / (b + eps)
+
+def crop(img, cropx, cropy):
+    z,y,x = img.shape
+    startx = x//2-(cropx//2)
+    starty = y//2-(cropy//2)    
+    return img[:, starty:starty+cropy,startx:startx+cropx]

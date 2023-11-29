@@ -4,7 +4,7 @@
 
 import sirf.Reg as reg
 import sirf.STIR as stir
-from misc import crop_image_to_circle, division
+from .misc import crop_image_to_circle, division
 
 
 def osem_step(input_image, radon_transform, acquired_data, sensitivity_image, transform_matrix=None):
