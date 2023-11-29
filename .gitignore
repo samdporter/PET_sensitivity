@@ -1,0 +1,12 @@
+# tmp files produced by stir
+**/tmp_*.hs
+**/tmp_*.s
+
+**/*.pt
+!data/training_data/plus_non_attenuated/ellipses_X_train_n16_0.pt
+!data/training_data/plus_non_attenuated/ellipses_y_train_n116_0.pt
+
+**/*.pth
+
+**/__pycache__
+
