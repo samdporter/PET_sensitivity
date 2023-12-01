@@ -4,7 +4,10 @@
 
 **/*.pt
 !data/training_data/plus_non_attenuated/ellipses_X_train_n16_0.pt
-!data/training_data/plus_non_attenuated/ellipses_y_train_n116_0.pt
+!data/training_data/plus_non_attenuated/ellipses_y_train_n16_0.pt
+
+# trained models
+**/data/trained_models/*
 
 **/*.pth
 
