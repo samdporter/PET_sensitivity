@@ -20,8 +20,8 @@ def generate_transformed_image(image, attn):
     ''' Generate n_images number of images with affine transformations '''
     # Use some strategy to choose the transformation parameters. Here, using np.random for demonstration
     theta = np.random.uniform(-np.pi/32, np.pi/32)
-    tx, ty = np.random.uniform(-1, 1), np.random.uniform(-1, 1)
-    sx, sy = np.random.uniform(0.92, 1.08), np.random.uniform(0.92, 1.08)
+    tx, ty = np.random.uniform(-0.5, 0.5), np.random.uniform(-0.5, 0.5)
+    sx, sy = np.random.uniform(0.95, 1.05), np.random.uniform(0.95, 1.05)
     
     vol_im = image.as_array()
     vol_transformed = affine_transform_2D(theta, tx, ty, sx, sy, vol_im[0,:])

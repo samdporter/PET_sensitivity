@@ -41,6 +41,8 @@ class UNet(nn.Module):
 
         # Apply padding
         x = F.pad(x, pad_w + pad_h)
+        
+        x[-1] *= 100 # Scale the last channel by 100
 
         conv1 = self.dconv_down1(x)
         x = self.maxpool(conv1)

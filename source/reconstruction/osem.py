@@ -4,7 +4,7 @@
 
 import sirf.Reg as reg
 import sirf.STIR as stir
-from .misc import crop_image_to_circle, division
+from .misc import division
 
 
 def osem_step(input_image, radon_transform, acquired_data, sensitivity_image, transform_matrix=None):
@@ -35,23 +35,25 @@ def osem_step(input_image, radon_transform, acquired_data, sensitivity_image, tr
 
         # Apply resampling
         resampled_image = resample.direct(input_image)  # R (u)
-        resampled_image.maximum(0)
-        processed_image = radon_transform.forward(resampled_image)  # P (R u)
+        resampled_image = resampled_image.maximum(0)
+        forward_projection = radon_transform.forward(resampled_image)  # P (R u)
     else:
-        processed_image = radon_transform.forward(input_image)  # P (u)
+        forward_projection = radon_transform.forward(input_image)  # P (u)
 
-    ratio = acquired_data.clone().fill(division(acquired_data, processed_image))  # f/(P R u) or f/(P u)
+    ratio = acquired_data.clone().fill(division(acquired_data, forward_projection))  # f/(P R u) or f/(P u)
 
     back_projected_ratio = radon_transform.backward(ratio)
+
     if resample_required:
         back_projected_ratio = resample.adjoint(back_projected_ratio)
+        back_projected_ratio = back_projected_ratio.maximum(0)
 
     update = division(back_projected_ratio, resample.adjoint(sensitivity_image) if resample_required else sensitivity_image)
 
     return input_image * update
 
 
-def osem(input_image, radon_transform, acquired_data, num_subsets, epochs, sensitivity_images, transform_matrices=None, resample=True):
+def osem_reconstruction(input_image, radon_transform, acquired_data, num_subsets, num_epochs, sensitivity_images, transform_matrices=None, resample=True):
     """
     Perform OSEM reconstruction.
 
@@ -74,11 +76,9 @@ def osem(input_image, radon_transform, acquired_data, num_subsets, epochs, sensi
 
     # Clone the input image to avoid modifying the original
     output_image = input_image.clone()
-    crop_image_to_circle(output_image, 60)
 
-    for epoch in range(epochs):
+    for epoch in range(num_epochs):
         for subset_num in range(num_subsets):
-            radon_transform.subset_num = subset_num
 
             # Determine if resampling is needed for the current subset
             transform_matrix = transform_matrices[subset_num] if resample else None
@@ -86,9 +86,6 @@ def osem(input_image, radon_transform, acquired_data, num_subsets, epochs, sensi
             # Perform the OSEM step (with or without resampling)
             output_image = osem_step(output_image, radon_transform, acquired_data[subset_num],
                                      sensitivity_images[subset_num], transform_matrix)
-
-            # Crop the image to a circle
-            crop_image_to_circle(output_image, 60)
 
     return output_image
 
