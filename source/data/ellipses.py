@@ -5,7 +5,7 @@
 import numpy as np
 import torch
 from sirf.STIR import AcquisitionSensitivityModel, AcquisitionModelUsingRayTracingMatrix
-from misc import random_phantom, affine_transform_2D_image
+from .misc import random_phantom, affine_transform_2D_image
 
 MAX_PHANTOM_INTENSITY = 0.096 * 2
 
