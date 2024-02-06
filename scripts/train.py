@@ -25,17 +25,17 @@ set_verbosity(0)
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--model', type=str, choices=['NUNet', 'UNet'], default='NUNet', help='NUNet, UNet')
-    parser.add_argument('-lr', '--learning_rate', type=float, default=0.0002, help='learning rate')
+    parser.add_argument('-m', '--model', type=str, choices=['NUNet', 'UNet'], default='UNet', help='NUNet, UNet')
+    parser.add_argument('-lr', '--learning_rate', type=float, default=0.002, help='learning rate')
     parser.add_argument('-b', '--batch_size', type=int, default=32, help='batch size')
     parser.add_argument('-n', '--num_samples', type=int, default=1024, help='Number of samples')
     parser.add_argument('-s', '--data_path', type=str, default=os.path.join(dir_path, 'data', 'training_data'), help='Path to data')
     parser.add_argument('-f', '--filename', type=str, default='ellipses', help='Filename of data')
     parser.add_argument('-g', '--generate_non_attenuated_sensitivity', action='store_true', help='include non-attenuated sensitivity')
-    parser.add_argument('-r', '--train_valid_ratio', type=float, default=0.9, help='ratio of training to validation data')
+    parser.add_argument('-r', '--train_valid_ratio', type=float, default=0.8, help='ratio of training to validation data')
     parser.add_argument('--n_epochs', type=int, default=1000, help='number of epochs')
     parser.add_argument('--save_path', type=str, default=os.path.join(dir_path, 'data', 'trained_models'), help='path to save data')
-    parser.add_argument('--scheduler', type=str, choices=['StepLR', 'ReduceLROnPlateau', 'CosineAnnealingLR', 'None'], default="StepLR", help='scheduler type')
+    parser.add_argument('--scheduler', type=str, choices=['StepLR', 'ReduceLROnPlateau', 'CosineAnnealingLR', 'None'], default="None", help='scheduler type')
     parser.add_argument('--pretrained', type=str, help='path to pretrained model')
     parser.add_argument('--save_name', type=str, default='model', help='name of saved data')
     parser.add_argument('--data_suffix', type=int, default=0, help='suffix of saved data')
@@ -51,12 +51,21 @@ def load_data(data_path, save_name, n_samples, train_valid_ratio, incl, suffix):
     train_size = int(train_valid_ratio * len(X))
     X_train, y_train = X[:train_size], y[:train_size]
     X_valid, y_valid = X[train_size:], y[train_size:]
+    
+    # ensure that data with 1 channel is expanded to a 4D tensor
+    if X_train.ndim == 3:
+        X_train = X_train.unsqueeze(1)
+        X_valid = X_valid.unsqueeze(1)
+    if y_train.ndim == 3:
+        y_train = y_train.unsqueeze(1)
+        y_valid = y_valid.unsqueeze(1)
+    
     return X_train, y_train, X_valid, y_valid
 
-def get_model(model_name):
+def get_model(model_name, in_channels=3, out_channels=1):
     models = {
-        'NUNet': NestedUNet(3, 1),
-        'UNet': UNet(3, 1)
+        'NUNet': NestedUNet(in_channels, out_channels),
+        'UNet': UNet(in_channels, out_channels)
     }
     if model_name in models:
         return models[model_name]
@@ -116,7 +125,9 @@ def main():
     train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=args.batch_size, shuffle=True)
     valid_loader = DataLoader(TensorDataset(X_valid, y_valid), batch_size=args.batch_size, shuffle=False)
 
-    model = get_model(args.model).to(device)
+    in_channels = 3 if args.generate_non_attenuated_sensitivity else 2
+    out_channels = 1
+    model = get_model(args.model, in_channels, out_channels).to(device)
 
     if args.pretrained:
         model.load_state_dict(torch.load(args.pretrained, map_location=device))
@@ -154,8 +165,8 @@ def main():
         print(f'Epoch {epoch+1}/{args.n_epochs} - Train Loss: {train_loss:.4f}, Valid Loss: {valid_loss:.4f}')
 
     # Save final model
-    final_model_path = os.path.join(save_path, 'final_model.pth')
-    save_checkpoint(model, optimizer, final_model_path)
+    date = pd.Timestamp.now().strftime("%Y%m%d%H%M")
+    save_checkpoint(model, optimizer, os.path.join(save_path, f'final_model+{date}.pth'))
 
     # delete checkpoint files
     for file in os.listdir(save_path):
@@ -164,6 +175,10 @@ def main():
 
     # Plot and save loss graph
     plot_loss(train_losses, valid_losses, os.path.join(save_path, 'loss_plot.png'))
+    
+    # save losses to csv
+    losses = pd.DataFrame({'train_loss': train_losses, 'valid_loss': valid_losses})
+    losses.to_csv(os.path.join(save_path, 'losses.csv'), index=False)
 
 if __name__ == '__main__':
     main()
